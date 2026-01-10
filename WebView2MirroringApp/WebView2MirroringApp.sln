@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36221.1 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{C8D5274F-AC00-46C7-1F8D-E88E81087A52}"
+	ProjectSection(SolutionItems) = preProject
+		Web\main.html = Web\main.html
+		Web\sub.html = Web\sub.html
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MirroringMain", "MirroringMain\MirroringMain.csproj", "{3E34AFF1-12D8-4EA2-BB89-18C13A0BF46C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "js", "js", "{6879422A-F3D6-43D5-8D9A-FFD3D62DBB33}"
+	ProjectSection(SolutionItems) = preProject
+		Web\js\main.js = Web\js\main.js
+		Web\js\sharedworker.js = Web\js\sharedworker.js
+		Web\js\sub.js = Web\js\sub.js
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3E34AFF1-12D8-4EA2-BB89-18C13A0BF46C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E34AFF1-12D8-4EA2-BB89-18C13A0BF46C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E34AFF1-12D8-4EA2-BB89-18C13A0BF46C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E34AFF1-12D8-4EA2-BB89-18C13A0BF46C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6879422A-F3D6-43D5-8D9A-FFD3D62DBB33} = {C8D5274F-AC00-46C7-1F8D-E88E81087A52}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {75612D97-3BB5-471E-992E-3D6898106A57}
+	EndGlobalSection
+EndGlobal
