@@ -1,1 +1,21 @@
-# WebView2MirroringApp
+﻿# WebView2MirroringApp
+
+프로젝트 개요
+- 양방향 미러링 앱
+
+Main,Sub WebView2 인스턴스 간의 양방향 통신 지원을 목표로 한다.
+
+
+양방향 미러링 서비스
+- SharedWorker 기반의 양방향 통신 (로컬 기반) 다른 WebView2 인스턴스 간의 통신 지원
+  * 같은 프로세스 (WebView2 인스턴스 2개)
+  * 서로 다른 프로세스 (각 프로세스에 WebView2 인스턴스 1개씩)
+  ```
+  프로세스 업무가 다른 로컬 환경에서의 WebView2 인스턴스 간의 통신을 지원합니다.
+  ```
+- Socket.IO 기반의 양방향 통신 (네트워크 기반) 다른 WebView2 인스턴스 간의 통신 지원
+  * 같은 프로세스 (WebView2 인스턴스 2개)
+  * 서로 다른 프로세스 (각 프로세스에 WebView2 인스턴스 1개씩)
+  ```
+  프로세스 업무가 다르거나 
+  ```
