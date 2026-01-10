@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net9.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -13,4 +13,9 @@
     <PackageReference Include="WebView2.Runtime.X86" Version="143.0.3650.139" />
   </ItemGroup>
 
+  <!--
+  <PropertyGroup>
+    <NoWarn>MSB3277</NoWarn>
+  </PropertyGroup>
+  -->
 </Project>
