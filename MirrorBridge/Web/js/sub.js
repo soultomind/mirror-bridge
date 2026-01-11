@@ -1,30 +1,9 @@
 ﻿(function () {
+    // `mirrorbridge.js`의 `MirrorBridge` 클래스를 사용하여 초기화
     const editor = document.getElementById('editor');
     const status = document.getElementById('status');
-    const clientId = 'sub';
 
-    const worker = new SharedWorker('/js/sharedworker.js');
-    const port = worker.port;
-    let programmaticUpdate = false;
-
-    port.onmessage = function (e) {
-        const msg = e.data;
-        if (msg && msg.type === 'mirror') {
-            programmaticUpdate = true;
-            editor.value = msg.text;
-            programmaticUpdate = false;
-            status.textContent = '상태: 외부에서 업데이트됨';
-        }
-    };
-
-    port.start();
-    status.textContent = '상태: 연결됨';
-
-    editor.addEventListener('input', function () {
-        if (programmaticUpdate) return;
-        const payload = { type: 'mirror', source: clientId, text: editor.value };
-        port.postMessage(payload);
-        status.textContent = '상태: 전송됨';
-        setTimeout(() => status.textContent = '상태: 연결됨', 600);
-    });
+    // 클라이언트 식별자 'sub'으로 브리지 생성
+    window.subMirror = new MirrorBridge('sub', editor, status);
+    
 })();
