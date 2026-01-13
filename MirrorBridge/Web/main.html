@@ -5,26 +5,164 @@
     <title>Main</title>
     <style>
         body {
-            font-family: Segoe UI, sans-serif;
-            margin: 8px;
+            font-family: Arial, sans-serif;
+            margin: 16px;
         }
 
-        textarea {
+        #editor {
             width: 100%;
-            height: 200px;
+            height: 300px;
         }
 
         #status {
-            margin-top: 6px;
-            color: green;
+            margin-top: 8px;
+            color: #333;
+        }
+
+        #subStatus {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .waiting {
+            background: #f0f0f0;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+
+        .connected {
+            background: #e6ffed;
+            color: #057a3b;
+            border: 1px solid #9fe1b7;
+        }
+
+        .disconnected {
+            background: #ffecec;
+            color: #9a1e1e;
+            border: 1px solid #f4b0b0;
+        }
+
+        #controls {
+            margin-top: 8px;
+        }
+
+        button {
+            margin-right: 8px;
+            padding: 6px 10px;
         }
     </style>
 </head>
 <body>
-    <h3>Main</h3>
-    <textarea id="editor" placeholder="여기에 입력하면 Sub에 미러됩니다"></textarea>
-    <div id="status">상태: 초기화 전</div>
-    <script src="./js/mirrorbridge.js"></script>
-    <script src="./js/main.js"></script>
+    <h2>Main</h2>
+    <textarea id="editor" placeholder="Main Editor"></textarea>
+    <div id="status">상태: 초기</div>
+
+    <div id="controls">
+        <button id="connectBtn" disabled>연결</button>
+        <button id="disconnectBtn">연결해제</button>
+        Sub 상태:
+        <span id="subStatus" class="waiting">대기</span>
+        <button id="echoBtn" style="margin-left:12px;">Sub에 에코 요청</button>
+    </div>
+
+    <script src="/js/mirrorbridge.js"></script>
+    <script>
+        (function () {
+            const editor = document.getElementById('editor');
+            const status = document.getElementById('status');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            const subStatusEl = document.getElementById('subStatus');
+            const echoBtn = document.getElementById('echoBtn');
+
+            // Main은 기본 autoConnect=true로 즉시 연결 (버튼으로 제어하려면 두번째 인자로 false)
+            const bridge = new MainMirrorBridge('/js/sharedworker.js', true);
+
+            // 에디터 입력은 연결 상태에서만 브로드캐스트
+            editor.addEventListener('input', () => {
+                if (!bridge.isConnected) return;
+                bridge.sendNotification('content:update', { text: editor.value }).catch(() => { });
+            });
+
+            // 연결 상태 변화 처리 (브리지의 connect/disconnect 이벤트)
+            bridge.on('connection', (state) => {
+                if (state === 'connected') {
+                    status.textContent = '상태: 연결됨';
+                    connectBtn.disabled = true;
+                    disconnectBtn.disabled = false;
+                } else if (state === 'disconnected') {
+                    status.textContent = '상태: 연결해제';
+                    connectBtn.disabled = false;
+                    disconnectBtn.disabled = true;
+                    // 연결해제 후 1.5초 뒤 대기 상태로 UI 복귀
+                    setTimeout(() => {
+                        subStatusEl.textContent = '대기';
+                        subStatusEl.className = 'waiting';
+                        status.textContent = '상태: 초기';
+                    }, 1500);
+                }
+            });
+
+            // peer 상태 이벤트로 Sub 상태 반영
+            bridge.on('peer:status', ({ id, status: st }) => {
+                if (!id) return;
+                if (id.toLowerCase() !== 'sub') return; // Sub만 반영
+                if (st === 'connected') {
+                    subStatusEl.textContent = '연결됨';
+                    subStatusEl.className = 'connected';
+                } else if (st === 'disconnected') {
+                    subStatusEl.textContent = '연결해제';
+                    subStatusEl.className = 'disconnected';
+                    // disconnected 후 1.5s 뒤 waiting
+                    if (bridge._subWaitingTimer) clearTimeout(bridge._subWaitingTimer);
+                    bridge._subWaitingTimer = setTimeout(() => {
+                        subStatusEl.textContent = '대기';
+                        subStatusEl.className = 'waiting';
+                    }, 1500);
+                } else if (st === 'waiting') {
+                    subStatusEl.textContent = '대기';
+                    subStatusEl.className = 'waiting';
+                }
+            });
+
+            // Connect / Disconnect 버튼
+            connectBtn.addEventListener('click', async () => {
+                try {
+                    await bridge.connect();
+                    status.textContent = '상태: 연결 시도중...';
+                    if (editor.value) bridge.sendNotification('content:update', { text: editor.value }).catch(() => { });
+                } catch (e) {
+                    console.error(e);
+                    status.textContent = '상태: 연결 실패';
+                }
+            });
+
+            disconnectBtn.addEventListener('click', () => {
+                bridge.disconnect();
+            });
+
+            // Echo 요청 (Sub에서 처리)
+            echoBtn.addEventListener('click', async () => {
+                try {
+                    const res = await bridge.sendRequest('echo', { text: editor.value });
+                    console.log('echo 응답:', res);
+                    status.textContent = '에코 응답 수신: ' + JSON.stringify(res);
+                } catch (err) {
+                    console.error('요청 실패', err);
+                    status.textContent = '요청 실패: ' + err.message;
+                }
+            });
+
+            // 수신된 content:update 처리
+            bridge.on('content:update', (payload) => {
+                // 프로그램적 반영을 원하면 더 정교한 플래그 사용 가능
+                editor.value = payload?.text ?? '';
+            });
+
+        })();
+    </script>
 </body>
 </html>
